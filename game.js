@@ -1,6 +1,7 @@
 /* =========================================================
-   POCKET FOOTBALL - 簡単操作サッカー
+   POCKET FOOTBALL - 簡単操作サッカー  v1.0
    Top-down 1vs1 mini soccer (机でサッカー風 + eFootball UI)
+   Live: https://guttyanneruuuuuu.github.io/efot/
    ========================================================= */
 
 (() => {
