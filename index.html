@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#0a3d1f" />
+<title>Pocket Football - 簡単操作サッカー</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div id="rotate-prompt">
+  <div class="rotate-inner">
+    <div class="rotate-icon">📱↻</div>
+    <div>端末を横向きにしてください</div>
+  </div>
+</div>
+
+<!-- Main Menu -->
+<div id="menu" class="screen active">
+  <div class="menu-bg"></div>
+  <div class="menu-content">
+    <h1 class="title">POCKET<br><span>FOOTBALL</span></h1>
+    <p class="subtitle">机でサッカー風 簡単操作 1vs1</p>
+    <div class="menu-buttons">
+      <button class="menu-btn primary" data-action="ai">
+        <span class="btn-icon">🤖</span>
+        <div><div class="btn-title">AI戦</div><div class="btn-sub">CPUと対戦</div></div>
+      </button>
+      <button class="menu-btn" data-action="host">
+        <span class="btn-icon">🎮</span>
+        <div><div class="btn-title">オンライン対戦（ホスト）</div><div class="btn-sub">友達を招待</div></div>
+      </button>
+      <button class="menu-btn" data-action="join">
+        <span class="btn-icon">🔗</span>
+        <div><div class="btn-title">オンライン対戦（参加）</div><div class="btn-sub">招待コード入力</div></div>
+      </button>
+      <button class="menu-btn" data-action="howto">
+        <span class="btn-icon">❓</span>
+        <div><div class="btn-title">操作説明</div><div class="btn-sub">遊び方を見る</div></div>
+      </button>
+    </div>
+    <div class="diff-select">
+      <span>AI難易度:</span>
+      <button class="diff-btn" data-diff="easy">かんたん</button>
+      <button class="diff-btn active" data-diff="normal">ふつう</button>
+      <button class="diff-btn" data-diff="hard">むずかしい</button>
+    </div>
+    <div class="footer-note">横画面推奨 / タップ操作</div>
+  </div>
+</div>
+
+<!-- How-To Screen -->
+<div id="howto" class="screen">
+  <div class="modal">
+    <h2>操作方法</h2>
+    <ul class="howto-list">
+      <li><b>左スティック</b>: 選手の移動 / ドリブル</li>
+      <li><b>🅿 パス</b>: 味方にパス（タップ）</li>
+      <li><b>🅢 シュート</b>: 押し続けてパワー溜め、離してシュート</li>
+      <li><b>🅓 ディフェンス</b>: 一番近い相手選手に切り替えてタックル</li>
+      <li>操作する選手は<b>白い輪</b>で表示されます</li>
+      <li>試合時間: 3分（前半1.5分・後半1.5分）</li>
+    </ul>
+    <button class="menu-btn primary" id="howto-back">戻る</button>
+  </div>
+</div>
+
+<!-- Online Setup Screen -->
+<div id="online" class="screen">
+  <div class="modal">
+    <h2 id="online-title">オンライン対戦</h2>
+    <div id="host-section" style="display:none;">
+      <p>友達にこのコードを伝えてください:</p>
+      <div class="code-display" id="host-code">接続中...</div>
+      <button class="menu-btn" id="copy-code">コードをコピー</button>
+      <p id="host-status" class="status-text">相手の接続を待っています...</p>
+    </div>
+    <div id="join-section" style="display:none;">
+      <p>ホストから受け取ったコードを入力:</p>
+      <input type="text" id="join-code-input" placeholder="例: ABC123" maxlength="20" />
+      <button class="menu-btn primary" id="connect-btn">接続する</button>
+      <p id="join-status" class="status-text"></p>
+    </div>
+    <button class="menu-btn" id="online-back">キャンセル</button>
+  </div>
+</div>
+
+<!-- Game Screen -->
+<div id="game" class="screen">
+  <canvas id="canvas"></canvas>
+
+  <!-- HUD -->
+  <div class="hud">
+    <div class="score-board">
+      <div class="team team-home">
+        <span class="team-name" id="home-name">YOU</span>
+        <span class="team-score" id="home-score">0</span>
+      </div>
+      <div class="timer" id="timer">1:30</div>
+      <div class="team team-away">
+        <span class="team-score" id="away-score">0</span>
+        <span class="team-name" id="away-name">CPU</span>
+      </div>
+    </div>
+    <button class="pause-btn" id="pause-btn">⏸</button>
+  </div>
+
+  <!-- Touch Controls -->
+  <div id="joystick" class="joystick">
+    <div class="joystick-base"></div>
+    <div class="joystick-stick" id="joystick-stick"></div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="action-btn btn-defense" id="btn-def">D</button>
+    <button class="action-btn btn-pass" id="btn-pass">P</button>
+    <button class="action-btn btn-shoot" id="btn-shoot">
+      <span class="power-ring" id="power-ring"></span>
+      S
+    </button>
+  </div>
+
+  <!-- Announcement Overlay -->
+  <div class="announcement" id="announcement"></div>
+
+  <!-- Pause Menu -->
+  <div class="pause-overlay" id="pause-overlay">
+    <div class="modal">
+      <h2>一時停止</h2>
+      <button class="menu-btn primary" id="resume-btn">再開</button>
+      <button class="menu-btn" id="quit-btn">メニューに戻る</button>
+    </div>
+  </div>
+
+  <!-- Result Overlay -->
+  <div class="result-overlay" id="result-overlay">
+    <div class="modal">
+      <h2 id="result-title">試合終了</h2>
+      <div class="final-score" id="final-score">0 - 0</div>
+      <div class="result-msg" id="result-msg"></div>
+      <button class="menu-btn primary" id="rematch-btn">もう一度</button>
+      <button class="menu-btn" id="back-menu-btn">メニューへ</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
